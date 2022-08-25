@@ -38,3 +38,22 @@ func Compare[T comparable](slice, slice2 []T) bool {
 	}
 	return true
 }
+
+func TakeAddr[T any](slice []T) []*T {
+	t := make([]*T, 0, len(slice))
+	for _, v := range slice {
+		t = append(t, &v)
+	}
+	return t
+}
+
+func RemoveAddr[T any](slice []*T) []T {
+	t := make([]T, 0, len(slice))
+	for _, v := range slice {
+		if v == nil {
+			continue
+		}
+		t = append(t, *v)
+	}
+	return t
+}
