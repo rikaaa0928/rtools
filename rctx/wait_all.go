@@ -9,7 +9,7 @@ type waitKeyType string
 
 var waitAllKey waitKeyType = "k"
 
-func InitWorkerWaiter(ctx context.Context) context.Context {
+func WithWorkerWaiter(ctx context.Context) context.Context {
 	wg := &sync.WaitGroup{}
 	return context.WithValue(ctx, waitAllKey, wg)
 }
