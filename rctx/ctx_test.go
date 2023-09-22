@@ -105,7 +105,7 @@ func TestEmptyStruct(t *testing.T) {
 	ctx = context.WithValue(ctx, kk, "v2")
 	t.Log(ctx.Value(kk))
 	t.Log(ctx.Value("k"))
-	ctx = rctx.InitWorkerWaiter(ctx)
+	ctx = rctx.WithWorkerWaiter(ctx)
 	for i := 0; i < 5; i++ {
 		go func(i int) {
 			for j := 0; j < 5; j++ {
