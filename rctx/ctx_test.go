@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/rikaaa0928/rtools/rctx"
 	"testing"
+	"time"
 )
 
 func TestPointer(t *testing.T) {
@@ -89,4 +90,35 @@ func TestConvert(t *testing.T) {
 	var x interface{} = make(map[string]string)
 	_, ok := x.(map[string]interface{})
 	t.Log(ok)
+}
+
+func TestEmptyStruct(t *testing.T) {
+	type a string
+	ctx := context.Background()
+	k := struct {
+	}{}
+	ctx = context.WithValue(ctx, k, "v1")
+	t.Log(ctx.Value(k))
+	t.Log(ctx.Value(struct {
+	}{}))
+	var kk a = "k"
+	ctx = context.WithValue(ctx, kk, "v2")
+	t.Log(ctx.Value(kk))
+	t.Log(ctx.Value("k"))
+	ctx = rctx.InitWorkerWaiter(ctx)
+	for i := 0; i < 5; i++ {
+		go func(i int) {
+			for j := 0; j < 5; j++ {
+				rctx.WorkerAdd(ctx)
+				go func(i, j int) {
+					time.Sleep(time.Second * time.Duration(i+j))
+					t.Logf("worker %d:%d done\n", i, j)
+					rctx.WorkerDone(ctx)
+				}(i, j)
+			}
+		}(i)
+	}
+	time.Sleep(time.Second)
+	rctx.WaitAllWorker(ctx)
+	t.Log("done")
 }
