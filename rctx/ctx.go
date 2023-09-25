@@ -4,6 +4,12 @@ import (
 	"context"
 )
 
+var defaultMKey interface{}
+
+func DefaultMapKey(k interface{}) {
+	defaultMKey = k
+}
+
 func WithPointer[K any, V any](ctx context.Context, k K, v V) context.Context {
 	x, ok := ctx.Value(k).(*V)
 	if !ok {
@@ -29,6 +35,10 @@ func Pointer[V any, K any](ctx context.Context, k K) *V {
 	return v
 }
 
+func DWithMapValue[K comparable, V any](ctx context.Context, k K, v V) context.Context {
+	return WithMapValue[any, K, V](ctx, defaultMKey, k, v)
+}
+
 func WithMapValue[M any, K comparable, V any](ctx context.Context, mk M, k K, v V) context.Context {
 	m, ok := ctx.Value(mk).(map[K]interface{})
 	if !ok {
@@ -38,6 +48,10 @@ func WithMapValue[M any, K comparable, V any](ctx context.Context, mk M, k K, v 
 	}
 	m[k] = v
 	return ctx
+}
+
+func DMapValueOK[V any, K comparable](ctx context.Context, k K) (*V, bool) {
+	return MapValueOK[V, any, K](ctx, defaultMKey, k)
 }
 
 func MapValueOK[V any, M any, K comparable](ctx context.Context, mk M, k K) (*V, bool) {
@@ -56,6 +70,10 @@ func MapValueOK[V any, M any, K comparable](ctx context.Context, mk M, k K) (*V,
 	return &tv, true
 }
 
+func DMapValue[V any, K comparable](ctx context.Context, k K) *V {
+	return MapValue[V, any, K](ctx, defaultMKey, k)
+}
+
 func MapValue[V any, M any, K comparable](ctx context.Context, mk M, k K) *V {
 	v, ok := MapValueOK[V](ctx, mk, k)
 	if !ok {
@@ -64,12 +82,20 @@ func MapValue[V any, M any, K comparable](ctx context.Context, mk M, k K) *V {
 	return v
 }
 
+func DMap[K comparable](ctx context.Context) map[K]interface{} {
+	return Map[K, any](ctx, defaultMKey)
+}
+
 func Map[K comparable, M any](ctx context.Context, mk M) map[K]interface{} {
 	m, ok := ctx.Value(mk).(map[K]interface{})
 	if !ok {
 		return nil
 	}
 	return m
+}
+
+func DVMap[K comparable, V any](ctx context.Context) map[K]V {
+	return VMap[K, V, any](ctx, defaultMKey)
 }
 
 func VMap[K comparable, V any, M any](ctx context.Context, mk M) map[K]V {

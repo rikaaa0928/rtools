@@ -122,3 +122,20 @@ func TestEmptyStruct(t *testing.T) {
 	rctx.WaitAllWorker(ctx)
 	t.Log("done")
 }
+
+func TestMapValue(t *testing.T) {
+	type a string
+	ctx := context.Background()
+	var kk a = "k"
+	ctx = rctx.WithMapValue(ctx, kk, "k1", "v2")
+	t.Log(rctx.MapValue[string](ctx, "k", "k1"))
+	t.Log(*rctx.MapValue[string](ctx, a("k"), "k1"))
+	t.Log(*rctx.MapValue[string](ctx, kk, "k1"))
+	var k2 interface{} = kk
+	t.Log(*rctx.MapValue[string](ctx, k2, "k1"))
+	rctx.DefaultMapKey(kk)
+	t.Log(*rctx.DMapValue[string](ctx, "k1"))
+	ctx = rctx.DWithMapValue(ctx, "k2", "vvv")
+	t.Log(rctx.DVMap[string, string](ctx))
+	t.Log(rctx.DMap[string](ctx))
+}
