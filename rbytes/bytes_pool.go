@@ -19,12 +19,12 @@ func Get(size int) []byte {
 		if !ok {
 			poolMap[size] = &sync.Pool{New: func() interface{} {
 				b := make([]byte, size)
-				return &b
+				return b
 			}}
 			pool = poolMap[size]
 		}
 	}
-	return *pool.Get().(*[]byte)
+	return pool.Get().([]byte)
 }
 
 func Put(b []byte) {
@@ -33,5 +33,5 @@ func Put(b []byte) {
 	if !ok {
 		return
 	}
-	pool.Put(&b)
+	pool.Put(b)
 }
